@@ -120,16 +120,16 @@ console.log(
 //Apartado 2
 
 const activarProtocoloUrgencia = (pacientes: Pacientes[]): boolean => {
-  let activarProtocolo = false;
-
-  for (let i = 0; i < pacientes.length && !activarProtocolo; i++) {
-    activarProtocolo =
-      pacientes[i].frecuenciaCardiaca > 100 && pacientes[i].temperatura > 39
-        ? (activarProtocolo = true)
-        : (activarProtocolo = false);
+  for (let i = 0; i < pacientes.length; i++) {
+    if (
+      pacientes[i].frecuenciaCardiaca > 100 &&
+      pacientes[i].temperatura > 39
+    ) {
+      return true;
+    }
   }
 
-  return activarProtocolo;
+  return false;
 };
 
 console.log("Emergencia?", activarProtocoloUrgencia(pacientes));
@@ -139,34 +139,44 @@ console.log("Emergencia?", activarProtocoloUrgencia(pacientes));
 const reasignaPacientesAMedicoFamilia = (
   pacientes: Pacientes[]
 ): Pacientes[] => {
-  let pacientesDePediatriaReasignados: Pacientes[] = [];
-  let pacientesDeMedicoFamilia: Pacientes[] = [];
-  let reasignacionPacientesDeMedicoFamilia: Pacientes[] = [];
-  let i = 0;
+  // let pacientesDePediatriaReasignados: Pacientes[] = [];
+  // let pacientesDeMedicoFamilia: Pacientes[] = [];
+  // let reasignacionPacientesDeMedicoFamilia: Pacientes[] = [];
+  // let i = 0;
 
-  while (i < pacientes.length) {
-    if (pacientes[i].especialidad === "Pediatra") {
-      pacientesDePediatriaReasignados = [
-        ...pacientesDePediatriaReasignados,
-        pacientes[i],
-      ];
-      for (let i = 0; i < pacientesDePediatriaReasignados.length; i++) {
-        pacientesDePediatriaReasignados[i] = {
-          ...pacientesDePediatriaReasignados[i],
-          especialidad: "Medico de familia",
-        };
-      }
+  const pacientesCopia = [...pacientes];
+
+  for(let i = 0; i < pacientesCopia.length; i++){
+    if (pacientesCopia[i].especialidad === "Pediatra"){
+      pacientesCopia[i].especialidad = "Medico de familia";
     }
-    if (pacientes[i].especialidad === "Medico de familia") {
-      pacientesDeMedicoFamilia = [...pacientesDeMedicoFamilia, pacientes[i]];
-    }
-    reasignacionPacientesDeMedicoFamilia = [
-      ...pacientesDeMedicoFamilia,
-      ...pacientesDePediatriaReasignados,
-    ];
-    i++;
   }
-  return reasignacionPacientesDeMedicoFamilia;
+
+  return pacientesCopia;
+  
+  // while (i < pacientes.length) {
+  //   if (pacientes[i].especialidad === "Pediatra") {
+  //     pacientesDePediatriaReasignados = [
+  //       ...pacientesDePediatriaReasignados,
+  //       pacientes[i],
+  //     ];
+  //     for (let i = 0; i < pacientesDePediatriaReasignados.length; i++) {
+  //       pacientesDePediatriaReasignados[i] = {
+  //         ...pacientesDePediatriaReasignados[i],
+  //         especialidad: "Medico de familia",
+  //       };
+  //     }
+  //   }
+  //   if (pacientes[i].especialidad === "Medico de familia") {
+  //     pacientesDeMedicoFamilia = [...pacientesDeMedicoFamilia, pacientes[i]];
+  //   }
+  //   reasignacionPacientesDeMedicoFamilia = [
+  //     ...pacientesDeMedicoFamilia,
+  //     ...pacientesDePediatriaReasignados,
+  //   ];
+  //   i++;
+  // }
+
 };
 
 console.log(
@@ -197,6 +207,19 @@ interface NumeroPacientesPorEspecialidad {
   cardiologia: number;
 }
 
+const contarPacientesPorTipoDeEspecilidad = (pacientes: Pacientes[], especialidad: Especialidad )=>{
+  let totalPacientes = 0;
+
+  for (let i = 0; i < pacientes.length; i++) {
+
+    if (pacientes[i].especialidad === especialidad) {
+      totalPacientes++;
+    }
+
+  }
+  return totalPacientes;
+}
+
 const cuentaPacientesPorEspecialidad = (
   pacientes: Pacientes[]
 ): NumeroPacientesPorEspecialidad => {
@@ -206,21 +229,11 @@ const cuentaPacientesPorEspecialidad = (
     cardiologia: 0,
   };
 
-  for (let i = 0; i < pacientes.length; i++) {
-    if (pacientes[i].especialidad === "Medico de familia") {
-      pacientesPorEspecialidad.medicoDeFamilia++;
-    }
-    if (pacientes[i].especialidad === "Pediatra") {
-      pacientesPorEspecialidad.pediatria++;
-    }
-    if (pacientes[i].especialidad === "Cardiólogo") {
-      pacientesPorEspecialidad.cardiologia++;
-    }
-  }
+  pacientesPorEspecialidad.cardiologia = contarPacientesPorTipoDeEspecilidad(pacientes, "Cardiólogo");
+  pacientesPorEspecialidad.medicoDeFamilia = contarPacientesPorTipoDeEspecilidad(pacientes, "Medico de familia");
+  pacientesPorEspecialidad.pediatria = contarPacientesPorTipoDeEspecilidad(pacientes, "Pediatra");
+
   return pacientesPorEspecialidad;
 };
 
-console.log(
-  "Total de pacientes por especialidad:",
-  cuentaPacientesPorEspecialidad(pacientes)
-);
+console.log(cuentaPacientesPorEspecialidad(pacientes));
